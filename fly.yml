@@ -1,0 +1,17 @@
+# Nota: fly.io usa por defecto el archivo fly.toml. Este fly.yml es un equivalente en YAML
+# con la configuración recomendada. Puedes usarlo como referencia o convertir su contenido
+# a fly.toml en la raíz del proyecto.
+
+app: railway-eventconsumer-webapi
+
+build:
+  dockerfile: "Railway.EventConsumer.WebApi/Dockerfile"
+
+services:
+  - internal_port: 8080
+    protocol: tcp
+    ports:
+      - port: 80
+        handlers: [http]
+      - port: 443
+        handlers: [tls, http]
