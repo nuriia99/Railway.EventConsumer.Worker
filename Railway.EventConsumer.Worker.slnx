@@ -1,0 +1,23 @@
+<Solution>
+  <Folder Name="/0. Elementos de la solución/">
+    <File Path="Directory.Packages.props" />
+  </Folder>
+  <Folder Name="/1. Railway.EventConsumer.WebApi/">
+    <Project Path="Railway.EventConsumer.WebApi/Railway.EventConsumer.WebApi.csproj" />
+  </Folder>
+  <Folder Name="/2. Railway.EventConsumer.Application/">
+    <Project Path="Railway.EventConsumer.Application/Railway.EventConsumer.Application.csproj" Id="014fb7ce-2226-468c-a2b7-b73fddc841ea" />
+  </Folder>
+  <Folder Name="/3. Railway.EventConsumer.Domain/">
+    <Project Path="Railway.EventConsumer.Domain/Railway.EventConsumer.Domain.csproj" Id="c79b774f-9764-4cae-b563-fbcfe8805cb8" />
+  </Folder>
+  <Folder Name="/4. Railway.EventConsumer.Infrastructure/">
+    <Project Path="Railway.EventConsumer.Infrastructure/Railway.EventConsumer.Infrastructure.csproj" Id="f247fe1d-bea2-4f07-8e5c-ae08c67e17b0" />
+  </Folder>
+  <Folder Name="/5. Railway.EventConsumer.CrossCutting/">
+    <Project Path="Railway.EventConsumer.CrossCutting/Railway.EventConsumer.CrossCutting.csproj" Id="c10b4c55-5090-4966-8668-a24a2eebabd5" />
+  </Folder>
+  <Folder Name="/6. Railway.EventConsumer.UnitTests/">
+    <Project Path="Railway.EventConsumer.UnitTests/Railway.EventConsumer.UnitTests.csproj" />
+  </Folder>
+</Solution>
