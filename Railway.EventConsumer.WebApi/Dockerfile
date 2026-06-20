@@ -12,6 +12,7 @@ EXPOSE 8081
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
+COPY Directory.Packages.props ./
 COPY ["Railway.EventConsumer.WebApi/Railway.EventConsumer.WebApi.csproj", "Railway.EventConsumer.WebApi/"]
 RUN dotnet restore "./Railway.EventConsumer.WebApi/Railway.EventConsumer.WebApi.csproj"
 COPY . .
