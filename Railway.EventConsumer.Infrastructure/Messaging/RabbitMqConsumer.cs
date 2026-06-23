@@ -2,6 +2,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using RabbitMQ.Client;
+using RabbitMQ.Client.Events;
 using Railway.EventConsumer.Application.Handlers;
 using Railway.EventConsumer.Domain.Events;
 using System.Text;
@@ -28,62 +29,64 @@ namespace Railway.EventConsumer.Infrastructure.Messaging
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             var connectionString = _config["RabbitMQ:ConnectionString"];
-            var queueName = _config["RabbitMQ:Queue"];
+            var queueName = _config["RabbitMQ:QueueName"];
 
-            if (string.IsNullOrWhiteSpace(connectionString) || string.IsNullOrWhiteSpace(queueName))
+            var factory = new ConnectionFactory { Uri = new Uri(connectionString!) };
+            _connection = factory.CreateConnection();
+            _channel = _connection.CreateModel();
+
+            var consumer = new EventingBasicConsumer(_channel);
+
+            consumer.Received += async (sender, args) =>
             {
-                _logger?.LogError("RabbitMQ configuration missing (RabbitMQ:ConnectionString or RabbitMQ:Queue)");
-                return;
-            }
-
-            try
-            {
-                var factory = new RabbitMQ.Client.ConnectionFactory { Uri = new Uri(connectionString) };
-                _connection = factory.CreateConnection();
-                _channel = _connection.CreateModel();
-
-                _channel.QueueDeclare(queue: queueName, durable: true, exclusive: false, autoDelete: false, arguments: null);
-
-                var consumer = new RabbitMQ.Client.Events.EventingBasicConsumer(_channel);
-
-                consumer.Received += async (sender, args) =>
+                try
                 {
-                    try
+                    var json = Encoding.UTF8.GetString(args.Body.ToArray());
+                    var message = JsonSerializer.Deserialize<MessageTest>(json);
+
+                    if (message != null)
+                        await _handler.HandleAsync(message, stoppingToken);
+
+                    _channel.BasicAck(args.DeliveryTag, false);
+                }
+                catch (Exception ex)
+                {
+                    var headers = args.BasicProperties.Headers != null
+                        ? new Dictionary<string, object>(args.BasicProperties.Headers)
+                        : new Dictionary<string, object>();
+
+                    int retryCount = headers.ContainsKey("x-retry-count")
+                        ? Convert.ToInt32(headers["x-retry-count"])
+                        : 0;
+
+                    if (retryCount < 3)
                     {
-                        var json = Encoding.UTF8.GetString(args.Body.ToArray());
-                        var message = JsonSerializer.Deserialize<MessageTest>(json);
+                        var props = _channel.CreateBasicProperties();
+                        props.Headers = headers;
+                        props.Headers["x-retry-count"] = retryCount + 1;
 
-                        if (message != null)
-                        {
-                            await _handler.HandleAsync(message, stoppingToken).ConfigureAwait(false);
-                        }
+                        _channel.BasicPublish(
+                            exchange: "retry-exchange",
+                            routingKey: "retry",
+                            basicProperties: props,
+                            body: args.Body);
 
-                        _channel!.BasicAck(args.DeliveryTag, false);
+                        _channel.BasicAck(args.DeliveryTag, false);
+                        _logger?.LogWarning($"Message send to retry: {retryCount + 1}/3");
                     }
-                    catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
+                    else
                     {
+                        _channel.BasicNack(args.DeliveryTag, false, false);
+                        _logger?.LogError("Message discard after 3 retries");
                     }
-                    catch (Exception ex)
-                    {
-                        _logger?.LogError(ex, "Error processing RabbitMQ message");
-                        try { _channel?.BasicNack(args.DeliveryTag, false, true); } catch { }
-                    }
-                };
+                }
+            };
 
-                _channel.BasicConsume(queue: queueName, autoAck: false, consumer: consumer);
+            _channel.BasicConsume(queueName, false, consumer);
+            _logger?.LogInformation($"Consumer is listening...");
 
-                try { await Task.Delay(Timeout.Infinite, stoppingToken).ConfigureAwait(false); } catch (TaskCanceledException) { }
-            }
-            catch (Exception ex)
-            {
-                _logger?.LogError(ex, "Fatal error in RabbitMQ consumer");
-                throw;
-            }
+            await Task.Delay(Timeout.Infinite, stoppingToken);
         }
 
-        public override void Dispose()
-        {
-            base.Dispose();
-        }
     }
 }
