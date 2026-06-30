@@ -6,9 +6,10 @@ namespace Railway.EventConsumer.Application.Configuration
     public static class ConfigurationExtension
     {
         public static IServiceCollection AddApplication(this IServiceCollection services)
-        {
-            services.AddScoped<IMessageTestHandler, MessageTestHandler>();
-            return services;
-        }
+            {
+                services.AddScoped<IMessageHandler, MessageTestHandler>();
+
+                return services;
+            }
     }
 }
