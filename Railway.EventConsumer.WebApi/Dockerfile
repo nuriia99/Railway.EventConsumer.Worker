@@ -13,19 +13,19 @@ FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY Directory.Packages.props ./
-COPY ["Railway.EventConsumer.webapi/Railway.EventConsumer.webapi.csproj", "Railway.EventConsumer.webapi/"]
-RUN dotnet restore "./Railway.EventConsumer.webapi/Railway.EventConsumer.webapi.csproj"
+COPY ["Railway.EventConsumer.WebApi/Railway.EventConsumer.WebApi.csproj", "Railway.EventConsumer.WebApi/"]
+RUN dotnet restore "./Railway.EventConsumer.WebApi/Railway.EventConsumer.WebApi.csproj"
 COPY . .
-WORKDIR "/src/Railway.EventConsumer.webapi"
-RUN dotnet build "./Railway.EventConsumer.webapi.csproj" -c $BUILD_CONFIGURATION -o /app/build
+WORKDIR "/src/Railway.EventConsumer.WebApi"
+RUN dotnet build "./Railway.EventConsumer.WebApi.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 # Esta fase se usa para publicar el proyecto de servicio que se copiará en la fase final.
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./Railway.EventConsumer.webapi.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "./Railway.EventConsumer.WebApi.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
 # Esta fase se usa en producción o cuando se ejecuta desde VS en modo normal (valor predeterminado cuando no se usa la configuración de depuración)
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "Railway.EventConsumer.webapi.dll"]
+ENTRYPOINT ["dotnet", "Railway.EventConsumer.WebApi.dll"]
