@@ -1,18 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project>
   <PropertyGroup>
-	<!-- Habilita la gestión centralizada de versiones (Central Package Management) -->
-	<ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    <!-- Habilita la gestión centralizada de versiones (Central Package Management) -->
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
   </PropertyGroup>
-
   <ItemGroup>
-	<!-- Paquetes detectados en la solución -->
-	<PackageVersion Include="coverlet.collector" Version="6.0.4" />
-	<PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
-	<PackageVersion Include="xunit" Version="2.9.3" />
-	<PackageVersion Include="xunit.runner.visualstudio" Version="3.1.4" />
-	<PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="10.0.8" />
-	<PackageVersion Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.23.0" />
-	<PackageVersion Include="Scalar.AspNetCore" Version="1.2.53" />
+    <!-- Paquetes detectados en la solución -->
+    <PackageVersion Include="coverlet.collector" Version="6.0.4" />
+    <PackageVersion Include="Microsoft.Extensions.Configuration.Abstractions" Version="10.0.9" />
+    <PackageVersion Include="Microsoft.Extensions.Hosting" Version="10.0.9" />
+    <PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.9" />
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
+    <PackageVersion Include="xunit" Version="2.9.3" />
+    <PackageVersion Include="xunit.runner.visualstudio" Version="3.1.4" />
+    <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="10.0.8" />
+    <PackageVersion Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.23.0" />
+    <PackageVersion Include="Scalar.AspNetCore" Version="1.2.53" />
+    <PackageVersion Include="RabbitMQ.Client" Version="6.8.1" />
   </ItemGroup>
 </Project>
