@@ -1,19 +1,25 @@
 ﻿using Railway.EventConsumer.Domain.Events;
 using Railway.EventConsumer.Domain.Exceptions;
+using System.Text.Json;
 
 namespace Railway.EventConsumer.Application.Handlers
 {
-    public class MessageTestHandler : IMessageTestHandler
+    public class MessageTestHandler : IMessageHandler
     {
-        public Task HandleAsync(MessageTest message, CancellationToken ct)
+        public string MessageType => "MessageTest";
+
+        public Task HandleAsync(JsonElement data)
         {
-            Console.WriteLine($"Procesando mensaje {message.MessageId}");
-
-            if (message.Amount < 0)
+            var message = JsonSerializer.Deserialize<MessageTest>(data.GetRawText());
+            if (message != null)
             {
-                throw new TestException("Test retry policy");
-            }
+                Console.WriteLine($"Procesando mensaje {message.MessageId}");
 
+                if (message.Amount < 0)
+                {
+                    throw new TestException("Test retry policy");
+                }
+            }
             return Task.CompletedTask;
         }
     }
