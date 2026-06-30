@@ -1,18 +1,10 @@
-using Railway.EventConsumer.WebApi.Extensions;
+using Railway.EventConsumer.Application.Configuration;
+using Railway.EventConsumer.Infrastructure.Configuration;
 
-var builder = WebApplication.CreateBuilder(args);
+var builder = Host.CreateApplicationBuilder(args);
 
-// Add services to the container.
-builder.Services.AddControllers();
-builder.Services.AddOpenApiDocumentation();
+builder.Services.AddApplication();
+builder.Services.AddInfrastructure(builder.Configuration);
 
-var app = builder.Build();
-
-app.UseHttpsRedirection();
-
-app.UseAuthorization();
-
-app.MapControllers();
-app.MapOpenApiDocumentation();
-
-app.Run();
+var host = builder.Build();
+host.Run();
